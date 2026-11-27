@@ -134,6 +134,7 @@ Avoid overly literal icons (dizzy stars, medical `+` crosses, medieval kite shie
   - **Radius vs Diameter:** `ParticleEmitter.Size` is **radius (half-width)** → pass `desiredStuds * 0.5`.
   - **Anti-Clip `ZOffset`:** Calibrate billboard `ZOffset >= 0.45 * unitDepth` (e.g., `4.4–5.6 studs` for `8–12 stud` units) so hit slashes never clip inside character torsos.
   - **Non-Square (`4×2`) & 1:1 Tiled Ribbons:** `ParticleEmitter` supports square grids (`2×2`, `4×4`, `8×8`) only; render `4×2` sheets and 1:1 tiled ribbons via invisible `Part` (`Transparency = 1`) + `SurfaceGui` + `ImageLabel` (`ResampleMode.Pixelated`, `ImageRectSize = (240, 256)`, `ImageRectOffset = (col * 256 + 8, row * 256)`, `ClipsDescendants = true`).
+  - **CRITICAL `SurfaceGui` `Top`/`Bottom` UV Swap Gotcha:** In Roblox, `Enum.NormalId.Top` and `.Bottom` swap the horizontal/vertical UV axes by 90° compared to `Front`/`Back` (mapping `CanvasSize.X` to `Size.Z` and `CanvasSize.Y` to `Size.X`). Never attach a `Top`/`Bottom` `SurfaceGui` to the horizontal plane of a crossed 3D beam/ribbon — it renders a rotated 90° box across the middle of the beam! Instead, give the horizontal ribbon carrier the **same** `Size = Vector3.new(fullLen, thick, 0.06)`, rotate it `CFrame.Angles(math.rad(90), 0, 0)` around its local `X` axis, and attach **`Front` & `Back`** `SurfaceGui`s identically to the vertical plane.
   - **Batch Upload:** Serve local PNG exports over `127.0.0.1` or use Asset Manager Bulk Import, store IDs in a central registry module, and call `ContentProvider:PreloadAsync`.
 
 ---
