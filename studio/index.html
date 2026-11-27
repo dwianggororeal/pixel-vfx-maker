@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Kybermon Pixel VFX 3D Studio</title>
+	<title>Pixel VFX 3D Studio</title>
 	<link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -18,8 +18,8 @@
 					<span class="px-dot"></span>
 				</div>
 				<div class="brand-text">
-					<h1>Kybermon Pixel VFX 3D Studio</h1>
-					<span class="brand-sub">Universal Grayscale Flipbooks &bull; Real 3D Planes &bull; 10-Stage Causal Choreography</span>
+					<h1>Pixel VFX 3D Studio</h1>
+					<span class="brand-sub">Engine-Agnostic Grayscale Flipbooks &bull; Real 3D Planes &bull; 10-Stage Causal Choreography</span>
 				</div>
 			</div>
 
@@ -171,8 +171,8 @@
 				</div>
 			</section>
 
-			<!-- RIGHT PANEL: 2D Pixel Sheet Inspector & Roblox Export -->
-			<aside class="panel panel-inspector" aria-label="2D Pixel Sheet Inspector and Roblox Export">
+			<!-- RIGHT PANEL: 2D Pixel Sheet Inspector & Universal Export -->
+			<aside class="panel panel-inspector" aria-label="2D Pixel Sheet Inspector and Engine Export">
 				<!-- 2D Live Frame Preview -->
 				<div class="inspector-section">
 					<div class="section-head">
@@ -204,10 +204,10 @@
 					</div>
 				</div>
 
-				<!-- Roblox Studio Preset & Export -->
+				<!-- Universal Export & Engine Metadata -->
 				<div class="inspector-section inspector-roblox">
 					<div class="section-head">
-						<h2>Roblox Studio Export</h2>
+						<h2>Universal Flipbook Export</h2>
 						<span class="mono-dim">4&times; Nearest PNG</span>
 					</div>
 
@@ -215,17 +215,17 @@
 
 					<div class="export-actions">
 						<button id="btnExportGray" type="button" class="export-btn primary">
-							<span class="export-title">Export Grayscale PNG (Roblox 4&times;)</span>
+							<span class="export-title">Export Grayscale PNG (4&times; Nearest)</span>
 							<span id="exportGraySub" class="export-sub">1024&times;1024 &bull; Universal Tint Ready</span>
 						</button>
 						<div class="export-secondary-row">
 							<button id="btnExportTinted" type="button" class="export-btn">Export Tinted PNG</button>
-							<button id="btnCopyLuau" type="button" class="export-btn accent">Copy Roblox Luau</button>
+							<button id="btnCopyLuau" type="button" class="export-btn accent">Copy Engine JSON</button>
 						</div>
 					</div>
 
 					<details class="luau-details">
-						<summary>Preview Generated Roblox Luau Snippet</summary>
+						<summary>Preview Universal Engine Metadata (JSON)</summary>
 						<pre class="luau-pre"><code id="luauCodePreview"></code></pre>
 					</details>
 				</div>

@@ -1668,75 +1668,38 @@
 		return `Color3.fromRGB(${r}, ${g}, ${b})`;
 	}
 
+	function rgbFloatToHex(rgb) {
+		const r = Math.round(PE.clamp01(rgb[0]) * 255).toString(16).padStart(2, "0");
+		const g = Math.round(PE.clamp01(rgb[1]) * 255).toString(16).padStart(2, "0");
+		const b = Math.round(PE.clamp01(rgb[2]) * 255).toString(16).padStart(2, "0");
+		return `#${r}${g}${b}`.toUpperCase();
+	}
+
 	function generateRobloxLuau(vfx) {
 		const cfg = getRobloxConfig(vfx);
-		const cMid = rgbFloatToColor3Str(cfg.pEl.rgb);
-		const cHot = rgbFloatToColor3Str(cfg.pEl.hot);
-		const cSec = rgbFloatToColor3Str(cfg.sEl.rgb);
-		const studs = Number((vfx.size[0] * cfg.tier.scaleMult * 1.8).toFixed(2));
-
-		if (cfg.instanceClass === "Beam") {
-			return [
-				`-- Kybermon Pixel VFX (${vfx.name}) | Tier: ${cfg.tier.label} | Element: ${cfg.pEl.name}`,
-				`-- Upload exported grayscale PNG (${cfg.exportW}x${cfg.exportH}) and paste Asset ID below.`,
-				`local beam = Instance.new("Beam")`,
-				`beam.Name = "VFX_${vfx.id}"`,
-				`beam.Texture = "rbxassetid://YOUR_GRAYSCALE_ASSET_ID"`,
-				`beam.TextureMode = Enum.TextureMode.Stretch`,
-				`beam.FaceCamera = true`,
-				`beam.Width0 = ${Number((vfx.size[1] * cfg.tier.scaleMult * 1.4).toFixed(2))}`,
-				`beam.Width1 = ${Number((vfx.size[1] * cfg.tier.scaleMult * 1.4).toFixed(2))}`,
-				`beam.LightEmission = ${cfg.lightEmission}`,
-				`beam.LightInfluence = 0`,
-				`beam.Color = ColorSequence.new({`,
-				`\tColorSequenceKeypoint.new(0, ${cHot}),`,
-				`\tColorSequenceKeypoint.new(0.5, ${cMid}),`,
-				`\tColorSequenceKeypoint.new(1, ${cfg.tier.dualColor ? cSec : cMid}),`,
-				`})`,
-				`beam.Attachment0 = allyMuzzleAttachment -- Ally Release Point (Stage 5)`,
-				`beam.Attachment1 = enemyHitAttachment   -- Target Contact Point (Stage 7)`,
-				`beam.Parent = allyRootPart`,
-			].join("\n");
-		}
-
-		const orientEnum = vfx.planeKind === "floor"
-			? "Enum.ParticleOrientation.VelocityPerpendicular"
-			: vfx.planeKind === "xplane"
-				? "Enum.ParticleOrientation.FacingCameraWorldUp"
-				: "Enum.ParticleOrientation.FacingCamera";
-
-		const lines = [
-			`-- Kybermon Pixel VFX (${vfx.name}) | Tier: ${cfg.tier.label} | Element: ${cfg.pEl.name}`,
-			`-- Universal Grayscale Sheet: ${cfg.layout} (${cfg.exportW}x${cfg.exportH} 4x Nearest PNG)`,
-			`local emitter = Instance.new("ParticleEmitter")`,
-			`emitter.Name = "VFX_${vfx.id}"`,
-			`emitter.Texture = "rbxassetid://YOUR_GRAYSCALE_ASSET_ID"`,
-			`emitter.FlipbookLayout = Enum.ParticleFlipbookLayout.${cfg.layout}`,
-			`emitter.FlipbookMode = Enum.ParticleFlipbookMode.${cfg.mode}`,
-			`emitter.FlipbookFramerate = NumberRange.new(${state.fps})`,
-			`emitter.Orientation = ${orientEnum}`,
-			`emitter.LightEmission = ${cfg.lightEmission}`,
-			`emitter.LightInfluence = 0`,
-			`emitter.Lifetime = NumberRange.new(${cfg.lifetime})`,
-			`emitter.Size = NumberSequence.new(${studs})`,
-			`emitter.Speed = NumberRange.new(0)`,
-			`emitter.Rate = ${vfx.loop ? 2 : 0}`,
-			`emitter.LockedToPart = true`,
-			`emitter.Color = ColorSequence.new({`,
-			`\tColorSequenceKeypoint.new(0, ${cHot}),`,
-			`\tColorSequenceKeypoint.new(0.35, ${cMid}),`,
-			`\tColorSequenceKeypoint.new(1, ${cMid}),`,
-			`})`,
-		];
-
-		if (cfg.tier.dualColor) {
-			lines.push(`-- Dual-Color Fusion Secondary Layer Tint (${cfg.sEl.name}): ${cSec}`);
-		}
-		if (!vfx.loop) {
-			lines.push(`-- Trigger strictly at Stage 7 (Impact): emitter:Emit(1)`);
-		}
-		lines.push(`emitter.Parent = targetAttachment`);
-		return lines.join("\n");
+		const isDark = !!cfg.pEl.isDark;
+		const payload = {
+			id: vfx.id,
+			name: vfx.name,
+			category: vfx.category,
+			role: vfx.role,
+			planeGeometry: vfx.planeKind,
+			grid: { cols: vfx.gridCols, rows: vfx.gridRows, frames: vfx.frameCount, cellPx: 64, safeMarginPx: 2 },
+			exportPng: { width: cfg.exportW, height: cfg.exportH, filter: "Nearest / Point", mipmaps: false },
+			playback: { mode: cfg.mode, fps: state.fps, durationSec: cfg.lifetime },
+			material: {
+				preset: cfg.materialLabel,
+				blendMode: isDark ? "AlphaBlend (Never Additive for Dark Tint)" : (vfx.materialPreset === "soft_transparent" ? "AlphaOrSoftAdditive" : "AlphaBlend"),
+				primaryTintHex: rgbFloatToHex(cfg.pEl.rgb),
+				hotCoreHex: rgbFloatToHex(cfg.pEl.hot),
+				secondaryTintHex: cfg.tier.dualColor ? rgbFloatToHex(cfg.sEl.rgb) : null,
+			},
+			tier: { id: cfg.tier.id, label: cfg.tier.label, scaleMult: cfg.tier.scaleMult },
+			ribbonTiling: vfx.planeKind === "ribbon"
+				? { tile1To1: true, cropMarginPxAt4x: 8, innerTileWidthPxAt4x: 240 }
+				: undefined,
+		};
+		return JSON.stringify(payload, null, 2);
 	}
 
 	function updateRobloxPanel() {
@@ -1744,13 +1707,24 @@
 		if (!vfx) return;
 		const cfg = getRobloxConfig(vfx);
 
+		const planeLabel = {
+			billboard: "Camera Billboard",
+			floor: "Horizontal Ground XZ",
+			xplane: "Crossed X-Plane",
+			ribbon: "1:1 Tiled 3D Ribbon",
+			orbit: "3D Orbit Ring",
+		}[vfx.planeKind] || cfg.orientation;
+		const blendLabel = cfg.pEl.isDark
+			? "Alpha (Dark-Safe)"
+			: (vfx.materialPreset === "soft_transparent" ? "Alpha / Soft Glow" : "Alpha Crisp");
+
 		const items = [
-			["FlipbookLayout", cfg.layout],
-			["FlipbookMode", cfg.mode],
-			["Orientation", cfg.orientation],
-			["LightEmission", String(cfg.lightEmission)],
-			["Lifetime", `${cfg.lifetime}s (${state.fps} FPS)`],
-			["MaterialPreset", cfg.materialLabel],
+			["Grid Layout", `${vfx.gridCols}×${vfx.gridRows} (${vfx.frameCount}f)`],
+			["Playback", cfg.mode],
+			["3D Plane", planeLabel],
+			["Blend Mode", blendLabel],
+			["Duration", `${cfg.lifetime}s (${state.fps} FPS)`],
+			["Material", cfg.materialLabel],
 		];
 
 		dom.robloxMetaGrid.innerHTML = items.map(([k, v]) => (
@@ -1795,14 +1769,7 @@
 		}
 
 		const suffix = useTint ? state.primaryElId.toLowerCase() : "grayscale";
-		let filename;
-		if (!useTint && vfx.exportFileName) {
-			filename = vfx.exportFileName;
-		} else if (useTint && vfx.exportFileName) {
-			filename = vfx.exportFileName.replace(/\.png$/i, `_${state.primaryElId}.png`);
-		} else {
-			filename = `kybermon_vfx_${vfx.id}_${suffix}_${outW}x${outH}.png`;
-		}
+		const filename = `pixel_vfx_${vfx.id}_${suffix}_${vfx.gridCols}x${vfx.gridRows}_${outW}x${outH}.png`;
 
 		const link = document.createElement("a");
 		link.download = filename;
@@ -1827,7 +1794,7 @@
 			ta.select();
 			try {
 				document.execCommand("copy");
-				showToast(`Copied Roblox Luau snippet for ${vfx.name}`);
+				showToast(`Copied engine metadata JSON for ${vfx.name}`);
 			} catch (err) {
 				showToast("Clipboard copy failed — copy from Preview box.");
 			}
@@ -1836,7 +1803,7 @@
 
 		if (navigator.clipboard && navigator.clipboard.writeText) {
 			navigator.clipboard.writeText(code).then(
-				() => showToast(`Copied Roblox Luau snippet for ${vfx.name}`),
+				() => showToast(`Copied engine metadata JSON for ${vfx.name}`),
 				fallbackCopy
 			);
 		} else {
