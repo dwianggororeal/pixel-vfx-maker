@@ -1,0 +1,4 @@
+exports_roblox_pilot/
+*.raw
+.DS_Store
+Thumbs.db

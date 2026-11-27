@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Kybermon Pixel VFX 3D Studio</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<div class="studio-shell">
+		<!-- Top Studio Header -->
+		<header class="studio-header">
+			<div class="brand-group">
+				<div class="brand-mark" aria-hidden="true">
+					<span class="px-dot"></span>
+					<span class="px-dot accent"></span>
+					<span class="px-dot accent"></span>
+					<span class="px-dot"></span>
+				</div>
+				<div class="brand-text">
+					<h1>Kybermon Pixel VFX 3D Studio</h1>
+					<span class="brand-sub">Universal Grayscale Flipbooks &bull; Real 3D Planes &bull; 10-Stage Causal Choreography</span>
+				</div>
+			</div>
+
+			<div class="header-meta">
+				<span id="studioStatusBadge" class="status-pill">32 VFX Ready</span>
+				<span id="activeSummaryBadge" class="summary-pill">C / U &bull; Grayscale</span>
+				<div class="kbd-hints" aria-label="Keyboard shortcuts">
+					<span><kbd>Space</kbd> Play</span>
+					<span><kbd>&larr;</kbd><kbd>&rarr;</kbd> Step</span>
+					<span><kbd>R</kbd> Clash</span>
+				</div>
+			</div>
+		</header>
+
+		<!-- 3-Column Workstation Grid -->
+		<main class="workstation-grid">
+			<!-- LEFT PANEL: 32-VFX Grayscale Catalog Browser -->
+			<aside class="panel panel-catalog" aria-label="VFX Catalog Browser">
+				<div class="panel-header">
+					<div class="panel-title-row">
+						<h2>VFX Catalog</h2>
+						<span id="vfxCountLabel" class="count-badge">32 / 32</span>
+					</div>
+					<div class="search-box">
+						<svg class="search-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+							<circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+							<path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+						</svg>
+						<input id="vfxSearch" type="text" placeholder="Search VFX, plane, role..." autocomplete="off" spellcheck="false">
+						<button id="btnClearSearch" class="icon-clear-btn" type="button" title="Clear search" aria-label="Clear search">&times;</button>
+					</div>
+					<div id="categoryTabs" class="category-tabs" role="tablist" aria-label="VFX categories"></div>
+				</div>
+
+				<div id="vfxList" class="vfx-list" role="listbox" aria-label="Pixel VFX list"></div>
+			</aside>
+
+			<!-- CENTER PANEL: Interactive 3D Plane Viewport + Controls + 10-Stage Timeline -->
+			<section class="panel panel-viewport" aria-label="3D Plane Viewport and Timeline">
+				<!-- Top Controls Bar -->
+				<div class="controls-strip">
+					<div class="control-row">
+						<div class="control-group">
+							<div class="control-label">
+								<span>Primary Element</span>
+								<span class="label-hint">Universal Grayscale Tint</span>
+							</div>
+							<div id="primaryElementBar" class="pill-group" role="radiogroup" aria-label="Primary Element Tint"></div>
+						</div>
+
+						<div id="secondaryElementWrap" class="control-group secondary-group">
+							<div class="control-label">
+								<span>Secondary Element</span>
+								<span id="secondaryElementStatus" class="fusion-badge">Dual-Color on U+U / Epic</span>
+							</div>
+							<div id="secondaryElementBar" class="pill-group" role="radiogroup" aria-label="Secondary Element Tint"></div>
+						</div>
+					</div>
+
+					<div class="control-row tier-row">
+						<div class="control-group tier-group">
+							<div class="control-label">
+								<span>Rarity / Combine Tier</span>
+								<span class="label-hint">Anti-Mewah Modular Scaling</span>
+							</div>
+							<div id="tierBar" class="pill-group tier-pills" role="radiogroup" aria-label="Rarity Tier"></div>
+						</div>
+						<p id="tierDesc" class="tier-desc"></p>
+					</div>
+				</div>
+
+				<!-- Live 3D WebGL Viewport -->
+				<div id="viewportWrap" class="viewport-wrap">
+					<canvas id="viewport3d"></canvas>
+
+					<!-- Top HUD Overlay -->
+					<div class="hud-top">
+						<div class="hud-vfx-info">
+							<div class="hud-title-line">
+								<span id="hudVfxName" class="hud-vfx-name">Loading VFX...</span>
+								<span id="hudPlaneBadge" class="plane-badge">BILLBOARD</span>
+								<span id="hudRoleBadge" class="role-badge">melee_hit</span>
+							</div>
+						</div>
+
+						<div class="hud-stage-box">
+							<span id="hudStagePill" class="stage-pill stage-prep">1. ANTICIPATION</span>
+							<span id="hudStageFrame" class="stage-frame-readout">SF 00 / 34 &bull; VFX --</span>
+						</div>
+					</div>
+
+					<!-- 10-Stage Causal Phase Rail -->
+					<div id="stageRail" class="stage-rail" aria-label="10-Stage Causal Lifecycle"></div>
+
+					<!-- Bottom HUD Overlay -->
+					<div class="hud-bottom">
+						<div class="hud-controls-left">
+							<div id="camPresetBar" class="hud-btn-group" role="group" aria-label="Camera Presets">
+								<button type="button" class="hud-btn active" data-preset="iso">Iso</button>
+								<button type="button" class="hud-btn" data-preset="side">Side</button>
+								<button type="button" class="hud-btn" data-preset="top">Top</button>
+								<button type="button" class="hud-btn" data-preset="front">Front</button>
+							</div>
+							<button id="btnAutoOrbit" type="button" class="hud-btn" aria-pressed="false">Auto-Orbit</button>
+							<button id="btnResetCam" type="button" class="hud-btn" title="Reset Camera (Double-Click Canvas)">Reset</button>
+						</div>
+
+						<div class="hud-controls-right">
+							<button id="btnWireframe" type="button" class="hud-btn" aria-pressed="false">Plane Wireframes</button>
+							<button id="btnShowArena" type="button" class="hud-btn active" aria-pressed="true">3D Arena</button>
+							<div id="arenaBgBar" class="hud-btn-group" role="group" aria-label="Arena Background">
+								<button type="button" class="hud-btn active" data-bg="dark">Dark</button>
+								<button type="button" class="hud-btn" data-bg="arena">Arena</button>
+								<button type="button" class="hud-btn" data-bg="light">Light</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="viewport-hint">Drag: Orbit &bull; Scroll: Zoom &bull; DblClick: Reset</div>
+				</div>
+
+				<!-- Playback & 10-Stage Timeline Dock -->
+				<div class="timeline-dock">
+					<div class="transport-bar">
+						<div class="transport-buttons">
+							<button id="btnPlayPause" type="button" class="ctrl-btn primary" title="Play / Pause (Space)">
+								<span class="btn-glyph">&#9646;&#9646;</span> Pause
+							</button>
+							<button id="btnStepPrev" type="button" class="ctrl-btn" title="Previous Frame (Left Arrow)">&larr; Prev</button>
+							<button id="btnStepNext" type="button" class="ctrl-btn" title="Next Frame (Right Arrow)">Next &rarr;</button>
+							<button id="btnReplayClash" type="button" class="ctrl-btn clash-btn" title="Replay Full 10-Stage Causal Clash (R)">&#8635; Replay 10-Stage Clash</button>
+							<button id="btnLoopToggle" type="button" class="ctrl-btn active" aria-pressed="true" title="Toggle Loop Playback">Loop: ON</button>
+						</div>
+
+						<div class="fps-control">
+							<label for="fpsSlider">FPS</label>
+							<input id="fpsSlider" type="range" min="6" max="30" step="1" value="14">
+							<span id="fpsValue" class="mono-val">14</span>
+						</div>
+					</div>
+
+					<div class="scrubber-section">
+						<div class="scrubber-header">
+							<span>Flipbook Frame Scrubber <span class="scrubber-tip">(Click any frame to pause &amp; inspect in 3D)</span></span>
+							<span id="scrubberMeta" class="mono-val">F00 / 16</span>
+						</div>
+						<div id="frameScrubber" class="frame-scrubber" role="group" aria-label="Flipbook Frames"></div>
+					</div>
+				</div>
+			</section>
+
+			<!-- RIGHT PANEL: 2D Pixel Sheet Inspector & Roblox Export -->
+			<aside class="panel panel-inspector" aria-label="2D Pixel Sheet Inspector and Roblox Export">
+				<!-- 2D Live Frame Preview -->
+				<div class="inspector-section">
+					<div class="section-head">
+						<h2>2D Pixel Preview</h2>
+						<div class="mini-toggles">
+							<button id="btnPreviewTint" type="button" class="mini-btn active" aria-pressed="true">Tinted</button>
+							<button id="btnPreviewBleed" type="button" class="mini-btn" aria-pressed="false">2px Bleed</button>
+						</div>
+					</div>
+
+					<div class="preview-stage">
+						<div class="checker-frame preview-2d-frame">
+							<canvas id="preview2d" width="192" height="192"></canvas>
+						</div>
+						<div id="previewFrameMeta" class="preview-meta mono-val">F00 / 16 &bull; 64&times;64 (3&times;) &bull; Bleed: 0 px</div>
+					</div>
+				</div>
+
+				<!-- Interactive Sprite Sheet -->
+				<div class="inspector-section">
+					<div class="section-head">
+						<h2>Flipbook Sheet</h2>
+						<span id="sheetMetaLabel" class="mono-dim">4&times;4 &bull; 256&times;256</span>
+					</div>
+
+					<div id="sheetWrap" class="checker-frame sheet-wrap" title="Click any cell to jump and pause on that frame">
+						<canvas id="sheetCanvas" width="256" height="256"></canvas>
+						<div id="sheetGridOverlay" class="sheet-grid-overlay"></div>
+					</div>
+				</div>
+
+				<!-- Roblox Studio Preset & Export -->
+				<div class="inspector-section inspector-roblox">
+					<div class="section-head">
+						<h2>Roblox Studio Export</h2>
+						<span class="mono-dim">4&times; Nearest PNG</span>
+					</div>
+
+					<div id="robloxMetaGrid" class="roblox-meta-grid"></div>
+
+					<div class="export-actions">
+						<button id="btnExportGray" type="button" class="export-btn primary">
+							<span class="export-title">Export Grayscale PNG (Roblox 4&times;)</span>
+							<span id="exportGraySub" class="export-sub">1024&times;1024 &bull; Universal Tint Ready</span>
+						</button>
+						<div class="export-secondary-row">
+							<button id="btnExportTinted" type="button" class="export-btn">Export Tinted PNG</button>
+							<button id="btnCopyLuau" type="button" class="export-btn accent">Copy Roblox Luau</button>
+						</div>
+					</div>
+
+					<details class="luau-details">
+						<summary>Preview Generated Roblox Luau Snippet</summary>
+						<pre class="luau-pre"><code id="luauCodePreview"></code></pre>
+					</details>
+				</div>
+			</aside>
+		</main>
+	</div>
+
+	<div id="toastNotice" class="toast-notice" role="status" aria-live="polite"></div>
+
+	<!-- Classic Script Tags in Exact Load Order (100% file:/// offline double-click compatible) -->
+	<script src="core/pixel_engine.js"></script>
+	<script src="vfx/pack_support.js"></script>
+	<script src="vfx/pack_delivery.js"></script>
+	<script src="vfx/pack_hits.js"></script>
+	<script src="vfx/pack_world.js"></script>
+	<script src="vfx/pack_status.js"></script>
+	<script src="core/webgl_3d_engine.js"></script>
+	<script src="core/app.js"></script>
+</body>
+</html>
